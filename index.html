@@ -47,7 +47,7 @@
   .sec-title small{font-weight:400;font-size:9pt;color:#555}
 
   /* 입력칸 공통: 눈에 보이는 입력 상자 */
-  input.cell{width:100%;border:0;border-bottom:1px dashed var(--fieldline);background:var(--field);padding:4px 5px;font-size:10.5pt;min-height:8mm}
+  input.cell{width:100%;border:0;border-bottom:1px dashed var(--fieldline);background:var(--field);padding:4px 3px;font-size:10pt;min-height:8mm;text-overflow:clip}
   input.cell:focus,textarea.notes:focus{outline:2px solid #6aa2cf;outline-offset:-2px;background:#fff}
   input.cell::placeholder,textarea.notes::placeholder{color:#b5b5b5}
 
@@ -56,16 +56,19 @@
   .pcinfo td{padding:3px 4px}
 
   /* signers */
-  .signers td{padding:3px 4px;height:22mm}
+  .signers td{padding:3px 3px;height:24mm;vertical-align:middle}
   .signers td.role{background:var(--fill)}
-  .signers td.role input.cell{background:transparent;text-align:center;font-weight:700;border-bottom-color:#bbb}
+  .signers td.sigcell{vertical-align:top}
+  .signers td.role input.cell{background:transparent;text-align:center;font-weight:700;border-bottom-color:#bbb;padding:4px 1px;letter-spacing:-0.3px}
   .signers input.cell{text-align:center}
-  .sigwrap{position:relative;width:100%;height:20mm}
+  .signers td.orgdept .stack{display:flex;flex-direction:column;gap:3px;height:calc(24mm - 6px)}
+  .signers td.orgdept input.cell{flex:1;min-height:0}
+  .signers td.sigcell{padding:3px 3px 2px}
+  .sigwrap{position:relative;width:100%;height:16mm}
   .sigwrap canvas{width:100%;height:100%;display:block;touch-action:none;border-radius:2px;background:var(--field)}
-  .sigwrap .clr{position:absolute;right:2px;top:2px;font-size:8pt;padding:1px 6px;border:1px solid #999;background:#fff;border-radius:3px;color:#555}
   .sigwrap .hint{position:absolute;left:0;right:0;bottom:2px;text-align:center;font-size:8pt;color:#bbb;pointer-events:none}
   .sigwrap.has .hint{display:none}
-  .sigdate{font-size:8.5pt;color:#555;text-align:right;margin-top:1px;height:12px}
+  .sigdate{font-size:8pt;color:#666;margin-left:auto}
   .deftools{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 2mm;font-size:9pt;color:#555}
   .deftools button{font-size:8.5pt;border:1px solid #bbb;background:#fff;border-radius:3px;padding:2px 7px;color:#333}
 
@@ -81,9 +84,9 @@
   .cb span{display:inline-block;width:5.5mm;height:5.5mm;border:1.5px solid #333;border-radius:1px;position:relative;background:#fff}
   .cb input:checked+span::after{content:"";position:absolute;left:1.3mm;top:-0.2mm;width:1.7mm;height:3.7mm;border:solid #111;border-width:0 2.2px 2.2px 0;transform:rotate(40deg)}
   .cb input:focus-visible+span{outline:2px solid #9cc0dd}
-  textarea.notes{width:100%;min-height:10mm;border:0;border-bottom:1px dashed var(--fieldline);background:var(--field);padding:3px 5px;font-size:9.5pt;line-height:1.35;resize:none;overflow:hidden;display:block}
-  .rowtools{display:flex;gap:8px;margin-top:3px;align-items:center}
-  .rowtools button{font-size:8.5pt;border:1px solid #bbb;background:#fff;border-radius:3px;padding:1px 6px;color:#444}
+  textarea.notes{width:100%;min-height:10mm;border:0;background:var(--field);padding:3px 5px;font-size:9.5pt;line-height:1.35;resize:none;overflow:hidden;display:block}
+  .rowtools{display:flex;gap:8px;margin-top:3px;padding-top:3px;border-top:1px dashed #c5c8c2;align-items:center}
+  .rowtools button{font-size:8.5pt;border:1px solid #bbb;background:#fff;border-radius:3px;padding:1px 8px;color:#444}
   .rowtools button.detail-btn{color:var(--auto);border-color:#b7cfe3}
   .detail{display:none;margin-top:3px;font-size:8pt;line-height:1.3;color:#333;background:#fafaf8;border:1px dashed #bbb;padding:3px 5px;max-height:220px;overflow:auto;white-space:pre-wrap;font-family:Consolas,"D2Coding",monospace}
   tr.open .detail{display:block}
@@ -98,7 +101,10 @@
   @page{size:A4;margin:12mm 11mm}
   @media print{
     html,body{background:#fff}
-    .toolbar,.dropzone,#dropOverlay,.sigwrap .clr,.sigwrap .hint,.rowtools,.deftools,.noprint{display:none!important}
+    .toolbar,.dropzone,#dropOverlay,.sigwrap .hint,.rowtools,.deftools,.noprint{display:none!important}
+    .signers td{height:20mm}
+    .sigwrap{height:18mm}
+    .signers td.orgdept .stack{height:calc(20mm - 6px)}
     .sheet{width:auto;max-width:none;margin:0;padding:0;box-shadow:none}
     tr,.headline{break-inside:avoid}
     input.cell,textarea.notes,.inline,.opinion textarea,.sigwrap canvas{background:#fff;border-bottom-color:#fff}
@@ -132,7 +138,7 @@
 </div>
 
 <div class="dropzone" id="dropzone">
-  <a href="https://bambabo-cmd.github.io/KOAT-checklist/pcheck_checklist.zip">[[체크스크립트 다운로드]]</a><br/>모든 칸은 직접 입력·수정할 수 있습니다. USB의 <b>reports\pcheck_….json</b> 파일을 페이지에 <b>끌어다 놓으면</b> 점검 결과가 자동으로 채워지고, 채워진 뒤에도 항목별 "지우기"로 개별 삭제·재입력이 됩니다.
+  모든 칸은 직접 입력·수정할 수 있습니다. USB의 <b>reports\pcheck_….json</b> 파일을 페이지에 <b>끌어다 놓으면</b> 점검 결과가 자동으로 채워지고, 채워진 뒤에도 항목별 "지우기"로 개별 삭제·재입력이 됩니다.
 </div>
 <div id="dropOverlay">여기에 놓으세요</div>
 
@@ -159,17 +165,23 @@
     <span id="defInfo"></span>
   </div>
   <table class="signers">
-    <colgroup><col style="width:22mm"><col style="width:36mm"><col style="width:22mm"><col style="width:26mm"><col></colgroup>
-    <tr><th>구분</th><th>소속/부서</th><th>직위</th><th>성명</th><th>서명</th></tr>
+    <colgroup><col style="width:25mm"><col style="width:40mm"><col style="width:31mm"><col style="width:25mm"><col></colgroup>
+    <tr><th>구분</th><th>소속 / 부서</th><th>직위</th><th>성명</th><th>서명</th></tr>
     <tr data-signer="inspector"><td class="role"><input class="cell" data-f="inspector.role" value="점검담당자"></td>
-      <td><input class="cell" data-f="inspector.dept" placeholder="소속/부서"></td><td><input class="cell" data-f="inspector.title" placeholder="직위"></td><td><input class="cell" data-f="inspector.name" placeholder="성명"></td>
-      <td><div class="sigwrap"><canvas data-sig="inspector"></canvas><button class="clr noprint" type="button">지우기</button><div class="hint">여기에 서명</div></div><div class="sigdate" data-sigdate="inspector"></div></td></tr>
+      <td class="orgdept"><div class="stack"><input class="cell" data-f="inspector.org" placeholder="소속"><input class="cell" data-f="inspector.dept" placeholder="부서"></div></td>
+      <td><input class="cell" data-f="inspector.title" placeholder="직위"></td><td><input class="cell" data-f="inspector.name" placeholder="성명"></td>
+      <td class="sigcell"><div class="sigwrap"><canvas data-sig="inspector"></canvas><div class="hint">여기에 서명</div></div>
+        <div class="rowtools noprint"><button type="button" class="clr">지우기</button><span class="sigdate" data-sigdate="inspector"></span></div></td></tr>
     <tr data-signer="business"><td class="role"><input class="cell" data-f="business.role" value="사업담당자"></td>
-      <td><input class="cell" data-f="business.dept" placeholder="소속/부서"></td><td><input class="cell" data-f="business.title" placeholder="직위"></td><td><input class="cell" data-f="business.name" placeholder="성명"></td>
-      <td><div class="sigwrap"><canvas data-sig="business"></canvas><button class="clr noprint" type="button">지우기</button><div class="hint">여기에 서명</div></div><div class="sigdate" data-sigdate="business"></div></td></tr>
+      <td class="orgdept"><div class="stack"><input class="cell" data-f="business.org" placeholder="소속"><input class="cell" data-f="business.dept" placeholder="부서"></div></td>
+      <td><input class="cell" data-f="business.title" placeholder="직위"></td><td><input class="cell" data-f="business.name" placeholder="성명"></td>
+      <td class="sigcell"><div class="sigwrap"><canvas data-sig="business"></canvas><div class="hint">여기에 서명</div></div>
+        <div class="rowtools noprint"><button type="button" class="clr">지우기</button><span class="sigdate" data-sigdate="business"></span></div></td></tr>
     <tr data-signer="patent"><td class="role"><input class="cell" data-f="patent.role" value="특사담당자"></td>
-      <td><input class="cell" data-f="patent.dept" placeholder="소속/부서"></td><td><input class="cell" data-f="patent.title" placeholder="직위"></td><td><input class="cell" data-f="patent.name" placeholder="성명"></td>
-      <td><div class="sigwrap"><canvas data-sig="patent"></canvas><button class="clr noprint" type="button">지우기</button><div class="hint">여기에 서명</div></div><div class="sigdate" data-sigdate="patent"></div></td></tr>
+      <td class="orgdept"><div class="stack"><input class="cell" data-f="patent.org" placeholder="소속"><input class="cell" data-f="patent.dept" placeholder="부서"></div></td>
+      <td><input class="cell" data-f="patent.title" placeholder="직위"></td><td><input class="cell" data-f="patent.name" placeholder="성명"></td>
+      <td class="sigcell"><div class="sigwrap"><canvas data-sig="patent"></canvas><div class="hint">여기에 서명</div></div>
+        <div class="rowtools noprint"><button type="button" class="clr">지우기</button><span class="sigdate" data-sigdate="patent"></span></div></td></tr>
   </table>
 
   <div class="sec-title">점검 항목 <small>체크칸 탭 = 선택, 다시 탭 = 해제</small></div>
@@ -185,7 +197,7 @@
     <textarea id="opinion" placeholder="미흡·확인필요 항목에 대한 조치 내용, 재점검 예정일 등"></textarea>
   </div>
   <div class="foot">
-    <span>한국농업기술진흥원 안전보안실 · 특허사무소 개인정보처리업무 점검</span>
+    <span id="footOrg"></span>
     <span id="footInfo"></span>
   </div>
 </main>
@@ -215,13 +227,13 @@
   // ★ 담당자 기본값: 여기 값을 고쳐두면 파일 자체에 기본값이 들어갑니다.
   //    브라우저에서 "현재 담당자 정보를 기본값으로 저장"을 누르면 그 값이 이 기본값보다 우선합니다(기기별 저장).
   const DEFAULT_SIGNERS = {
-    'inspector.role':'점검담당자', 'inspector.dept':'농진원/안전보안실', 'inspector.title':'', 'inspector.name':'',
-    'business.role':'사업담당자',  'business.dept':'농진원/기술창출평가팀', 'business.title':'', 'business.name':'',
-    'patent.role':'특사담당자',    'patent.dept':'',                                 'patent.title':'',   'patent.name':''
+    'inspector.role':'점검담당자', 'inspector.org':'농진원', 'inspector.dept':'', 'inspector.title':'', 'inspector.name':'',
+    'business.role':'사업담당자',  'business.org':'농진원',  'business.dept':'',  'business.title':'',  'business.name':'',
+    'patent.role':'특사담당자',    'patent.org':'',          'patent.dept':'',    'patent.title':'',    'patent.name':''
   };
   const DEF_KEY = 'pcheck.signers.v1';
   function storedDefaults(){ try{ const v=localStorage.getItem(DEF_KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
-  function applySigners(obj){ document.querySelectorAll('input.cell[data-f]').forEach(i=>{ i.value = (obj && obj[i.dataset.f]!==undefined) ? obj[i.dataset.f] : (DEFAULT_SIGNERS[i.dataset.f]||''); }); }
+  function applySigners(obj){ document.querySelectorAll('input.cell[data-f]').forEach(i=>{ i.value = (obj && obj[i.dataset.f]!==undefined) ? obj[i.dataset.f] : (DEFAULT_SIGNERS[i.dataset.f]||''); }); updateFoot(); }
   function loadDefaults(){ const st=storedDefaults(); applySigners(st||DEFAULT_SIGNERS); const info=document.getElementById('defInfo'); if(info) info.textContent = st ? '기본값: 이 기기에 저장된 값' : '기본값: 파일 내장값'; }
   function saveDefaults(){ const o={}; document.querySelectorAll('input.cell[data-f]').forEach(i=>o[i.dataset.f]=i.value);
     try{ localStorage.setItem(DEF_KEY, JSON.stringify(o)); document.getElementById('defInfo').textContent='기본값: 이 기기에 저장된 값'; status('담당자 정보를 이 기기의 기본값으로 저장했습니다'); }
@@ -235,6 +247,14 @@
   const esc = s => String(s??'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
   const today = () => { const d=new Date(), p=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`; };
   const grow = ta => { ta.style.height='auto'; ta.style.height=(ta.scrollHeight+2)+'px'; };
+  // 문서 하단 소속 표시: 점검담당자 소속·부서 입력값을 따라감
+  function updateFoot(){
+    const org=(document.querySelector('input[data-f="inspector.org"]')||{}).value||'';
+    const dept=(document.querySelector('input[data-f="inspector.dept"]')||{}).value||'';
+    const who=[org,dept].filter(Boolean).join(' ');
+    $('#footOrg').textContent = (who ? who+' · ' : '') + '특허사무소 개인정보처리업무 점검';
+  }
+  document.addEventListener('input', e=>{ if (e.target.matches('input[data-f="inspector.org"],input[data-f="inspector.dept"]')) updateFoot(); });
 
   /* ---------- checklist rows ---------- */
   const body = $('#checkBody');
@@ -245,7 +265,7 @@
     tr.innerHTML = `<td class="no">${esc(it.no)}</td><td class="item">${esc(it.name)}</td>` +
       RESULTS.map(r => `<td class="res"><label class="cb"><input type="radio" name="r-${it.id}" value="${r}"><span></span></label></td>`).join('') +
       `<td class="note"><textarea class="notes" rows="1" placeholder="점검 내용 직접 입력"></textarea>
-       <div class="rowtools noprint"><button type="button" class="detail-btn" hidden></button><button type="button" class="row-clear">이 항목 지우기</button></div>
+       <div class="rowtools noprint"><button type="button" class="detail-btn" hidden></button><button type="button" class="row-clear">지우기</button></div>
        <div class="detail" hidden></div></td>`;
     body.appendChild(tr);
   }
@@ -296,7 +316,7 @@
       canvas.addEventListener('pointerdown', e=>this.down(e));
       canvas.addEventListener('pointermove', e=>this.move(e));
       ['pointerup','pointercancel','pointerleave'].forEach(n=>canvas.addEventListener(n, e=>this.up(e)));
-      canvas.parentElement.querySelector('.clr').addEventListener('click', ()=>this.clear());
+      canvas.closest('td').querySelector('.clr').addEventListener('click', ()=>this.clear());
     }
     allowed(e){ return e.pointerType==='pen' || !$('#penOnly').checked; }
     resize(){
@@ -379,6 +399,7 @@
     $('#pcNote').value=f.pcNote||''; $('#opinion').value=f.opinion||'';
     for (const k in (f.pc||{})){ const i=document.querySelector(`input[data-m="${k}"]`); if(i) i.value=f.pc[k]; }
     for (const k in (f.signers||{})){ const i=document.querySelector(`input.cell[data-f="${k}"]`); if(i) i.value=f.signers[k]; }
+    updateFoot();
     for (const id in (f.results||{})){ const tr=body.querySelector(`tr[data-id="${id}"]`); if(!tr) continue; const r=f.results[id];
       tr.querySelectorAll('input[type=radio]').forEach(x=>{ x.checked=(x.value===r.result); x.dataset.was=x.checked?'1':''; });
       const t=tr.querySelector('textarea.notes'); t.value=r.note||''; grow(t); tr.classList.toggle('auto', !!r.auto);
