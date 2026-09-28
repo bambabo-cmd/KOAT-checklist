@@ -215,8 +215,8 @@
   // ★ 담당자 기본값: 여기 값을 고쳐두면 파일 자체에 기본값이 들어갑니다.
   //    브라우저에서 "현재 담당자 정보를 기본값으로 저장"을 누르면 그 값이 이 기본값보다 우선합니다(기기별 저장).
   const DEFAULT_SIGNERS = {
-    'inspector.role':'점검담당자', 'inspector.dept':'한국농업기술진흥원 AI정보센터', 'inspector.title':'', 'inspector.name':'',
-    'business.role':'사업담당자',  'business.dept':'한국농업기술진흥원 기술창출평가팀', 'business.title':'', 'business.name':'',
+    'inspector.role':'점검담당자', 'inspector.dept':'농진원/AI정보센터', 'inspector.title':'', 'inspector.name':'',
+    'business.role':'사업담당자',  'business.dept':'농진원/기술창출평가팀', 'business.title':'', 'business.name':'',
     'patent.role':'특사담당자',    'patent.dept':'',                                 'patent.title':'',   'patent.name':''
   };
   const DEF_KEY = 'pcheck.signers.v1';
@@ -251,14 +251,20 @@
   }
   body.querySelectorAll('textarea.notes').forEach(t=>t.addEventListener('input', ()=>{ grow(t); t.closest('tr').classList.remove('auto'); }));
   // 체크칸: 다시 탭하면 해제 (수동 변경 시 '자동' 표시 제거)
+  // 체크칸: 누르기 직전 상태를 기록해 두고, 이미 선택된 칸을 다시 누르면 해제
+  body.addEventListener('pointerdown', e => {
+    const lab = e.target.closest('label.cb'); if (!lab) return;
+    const inp = lab.querySelector('input'); inp.dataset.was = inp.checked ? '1' : '';
+  }, true);
   body.addEventListener('click', e => {
-    const inp = e.target.closest('label.cb')?.querySelector('input');
-    if (inp) {
-      if (inp.dataset.was === '1') { inp.checked = false; inp.dataset.was=''; e.preventDefault(); }
-      else { body.querySelectorAll(`input[name="${inp.name}"]`).forEach(i=>i.dataset.was=''); inp.dataset.was='1'; }
+    if (e.target.matches('label.cb input')) {
+      const inp = e.target;
+      if (inp.dataset.was === '1') { inp.checked = false; }
+      inp.dataset.was = '';
       inp.closest('tr').classList.remove('auto');
       return;
     }
+    if (e.target.closest('label.cb')) return;   // 라벨 클릭은 브라우저가 input 클릭으로 다시 보내줌
     const b = e.target.closest('.detail-btn');
     if (b) { const tr=b.closest('tr'); tr.classList.toggle('open'); b.textContent = tr.classList.contains('open') ? '상세 닫기' : `상세 보기 (${tr.dataset.n}줄)`; return; }
     const c = e.target.closest('.row-clear');
@@ -266,7 +272,7 @@
   });
   function clearRow(tr){
     tr.classList.remove('auto','open');
-    tr.querySelectorAll('input[type=radio]').forEach(r=>{ r.checked=false; r.dataset.was=''; });
+    tr.querySelectorAll('input[type=radio]').forEach(r=>{ r.checked=false; });
     const t=tr.querySelector('textarea.notes'); t.value=''; grow(t);
     setDetails(tr, []);
   }
