@@ -24,6 +24,7 @@
   .toolbar .sp{flex:1}
   .toolbar .opt{display:flex;align-items:center;gap:6px;font-size:10pt}
   .toolbar .opt input{width:18px;height:18px}
+  .toolbar .optbox{background:#3d4238;border-radius:6px;padding:6px 10px}
   #status{font-size:10pt;color:#ffd54a;min-width:120px}
 
   /* ---- drop zone ---- */
@@ -95,7 +96,11 @@
   .detail .more{display:none}
   .legend{font-size:9pt;color:#444;margin-top:2mm}
 
-  .opinion{margin-top:6mm}
+  .tally{margin-top:5mm;border:1.5px solid var(--rule);background:var(--fill);padding:5px 8px;font-size:10.5pt;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;break-inside:avoid-page}
+  .tally b{font-size:11pt}
+  .tally .bad{color:#a8231f;font-weight:700}
+  .tally .warn{color:#8a5a00;font-weight:700}
+  .opinion{margin-top:4mm}
   .opinion textarea{width:100%;min-height:26mm;border:1px solid var(--rule);padding:6px;resize:vertical;font-size:10.5pt;background:var(--field)}
   .foot{margin-top:5mm;font-size:9pt;color:#555;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px}
 
@@ -154,11 +159,11 @@
   <button id="btnSaveForm">작성내용 저장</button>
   <label class="btn">작성내용 불러오기<input type="file" id="formIn" accept=".json,application/json" hidden></label>
   <button id="btnPrint" class="primary">PDF 저장 / 인쇄</button>
+  <label class="opt optbox"><input type="checkbox" id="optAppendix"> 별지 출력(문제점 요약·상세)</label>
   <button id="btnClearAuto">자동입력만 지우기</button>
   <button id="btnReset" class="danger">전체 지우기</button>
   <span class="sp"></span>
   <label class="opt"><input type="checkbox" id="penOnly"> 서명은 펜(Apple Pencil)만</label>
-  <label class="opt"><input type="checkbox" id="optAppendix"> 별지 출력(문제점 요약·상세)</label>
   <span id="status"></span>
 </div>
 
@@ -217,6 +222,7 @@
   </table>
   <div class="legend">※ "자동" 표시는 수집 스크립트 결과로 채워진 항목입니다. 점검자가 결과·비고를 수정하면 표시가 사라지며, 확인필요 = 자동판별 불가 또는 담당자 판단 필요.</div>
 
+  <div class="tally" id="tally"></div>
   <div class="opinion">
     <div class="sec-title" style="margin-top:0">종합의견 / 조치사항</div>
     <textarea id="opinion" placeholder="미흡·확인필요 항목에 대한 조치 내용, 재점검 예정일 등"></textarea>
@@ -414,6 +420,7 @@
     $('#footInfo').textContent = `자동수집 ${m.generatedAt||''} · 스크립트 v${m.scriptVersion||'?'}`;
     status(`점검결과 ${n}개 항목 자동입력 완료 (항목별 수정·지우기 가능)`, 5000);
     if (typeof buildAppendix==='function') buildAppendix();
+    if (typeof buildAppendix==='function') buildAppendix();
   }
   function clearAuto(){
     body.querySelectorAll('tr.auto').forEach(clearRow);
@@ -534,6 +541,18 @@
   $('#optAppendix').addEventListener('change', ()=>{ buildAppendix(); try{ localStorage.setItem(AP_KEY, $('#optAppendix').checked?'1':''); }catch(e){} });
   try{ if(localStorage.getItem(AP_KEY)==='1') $('#optAppendix').checked=true; }catch(e){}
   window.addEventListener('beforeprint', buildAppendix);
+  // 체크·비고·날짜 등을 바꾸면 별지도 즉시 갱신
+  function buildTally(){
+    const total=body.querySelectorAll('tr[data-id]').length; const c={'양호':0,'미흡':0,'확인필요':0}; let none=0;
+    body.querySelectorAll('tr[data-id]').forEach(tr=>{ const r=tr.querySelector('input[type=radio]:checked'); if(r) c[r.value]++; else none++; });
+    $('#tally').innerHTML = `<span>점검 결과 집계 : <b>전체 ${total}건</b></span><span>양호 <b>${c['양호']}건</b></span><span class="${c['미흡']?'bad':''}">미흡 <b>${c['미흡']}건</b></span><span class="${c['확인필요']?'warn':''}">확인필요 <b>${c['확인필요']}건</b></span>` + (none?`<span style="color:#666">미판정 ${none}건</span>`:'');
+  }
+  const _buildAppendix=buildAppendix; buildAppendix=function(){ buildTally(); _buildAppendix(); };
+  window.addEventListener('beforeprint', buildTally);
+  let apTimer=null; const apRefresh=()=>{ clearTimeout(apTimer); apTimer=setTimeout(buildAppendix,150); };
+  document.getElementById('sheet').addEventListener('input', apRefresh);
+  document.getElementById('sheet').addEventListener('change', apRefresh);
+  document.getElementById('sheet').addEventListener('click', e=>{ if(e.target.closest('label.cb, .row-clear')) apRefresh(); });
   buildAppendix();
 
   /* ---------- QR(URL #d=) 로 전달된 결과 자동 적용 ---------- */
